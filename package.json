@@ -1,0 +1,13 @@
+{
+  "name": "chaoxian-survey",
+  "version": "1.0.0",
+  "description": "宁波市公路超限运输管理实施规定执行情况调查问卷",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "localtunnel": "^2.0.2"
+  }
+}
