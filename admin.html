@@ -21,8 +21,11 @@
       justify-content: space-between;
     }
     .header h1 { font-size: 18px; font-weight: 700; }
+    .header .header-right { display: flex; gap: 16px; align-items: center; }
     .header .back-link { color: #93c5fd; text-decoration: none; font-size: 13px; }
     .header .back-link:hover { color: #fff; }
+    .header .logout-btn { color: #fca5a5; background: none; border: 1px solid #fca5a5; padding: 5px 14px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    .header .logout-btn:hover { color: #fff; border-color: #fff; }
 
     .content { max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; }
 
@@ -147,7 +150,7 @@
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.5);
-      z-index: 100;
+      z-index: 200;
       align-items: center;
       justify-content: center;
     }
@@ -244,13 +247,90 @@
     }
     .yn-segment .bar-num { font-size: 16px; font-weight: 700; }
     .yn-segment .bar-label { font-size: 11px; color: #888; }
+
+    /* ---------- 登录覆盖层 ---------- */
+    .login-overlay {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0f2b5c 0%, #1a3a6c 50%, #224488 100%);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-overlay.hidden { display: none; }
+
+    .login-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 48px 40px;
+      width: 400px;
+      max-width: 92vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .login-box .lock-icon { font-size: 48px; margin-bottom: 16px; }
+    .login-box h2 { font-size: 20px; color: #1a3a6c; margin-bottom: 8px; }
+    .login-box .hint { font-size: 13px; color: #888; margin-bottom: 28px; }
+
+    .login-box input[type="password"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e4ee;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 16px;
+    }
+    .login-box input[type="password"]:focus { border-color: #1a56db; }
+
+    .login-box .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .login-box .login-btn:hover { background: #1446b5; }
+    .login-box .login-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    .login-box .error-msg {
+      color: #dc2626;
+      font-size: 13px;
+      margin-top: 12px;
+      min-height: 20px;
+    }
   </style>
 </head>
 <body>
 
+<!-- ========== 登录覆盖层 ========== -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="lock-icon">🔐</div>
+    <h2>统计后台登录</h2>
+    <p class="hint">请输入管理密码以查看统计数据</p>
+    <form onsubmit="handleLogin(event)">
+      <input type="password" id="loginPassword" placeholder="请输入密码" autofocus autocomplete="off">
+      <button type="submit" class="login-btn" id="loginBtn">登 录</button>
+    </form>
+    <div class="error-msg" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ========== 主内容 ========== -->
 <div class="header">
   <h1>📊 调查问卷统计后台</h1>
-  <a href="index.html" class="back-link">← 返回问卷填写</a>
+  <div class="header-right">
+    <a href="index.html" class="back-link">← 返回问卷填写</a>
+    <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+  </div>
 </div>
 
 <div class="content">
@@ -304,14 +384,85 @@
 <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(this)">
 
 <script>
+// ========== 鉴权管理 ==========
+const TOKEN_KEY = 'admin_token';
+let adminToken = sessionStorage.getItem(TOKEN_KEY) || '';
+
+function authHeaders() {
+  return adminToken ? { 'Authorization': 'Bearer ' + adminToken } : {};
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const errorEl = document.getElementById('loginError');
+
+  if (!password) { errorEl.textContent = '请输入密码'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '验证中…';
+  errorEl.textContent = '';
+
+  try {
+    const resp = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const result = await resp.json();
+    if (resp.ok && result.success) {
+      adminToken = result.token;
+      sessionStorage.setItem(TOKEN_KEY, adminToken);
+      document.getElementById('loginOverlay').classList.add('hidden');
+      renderTable();
+    } else {
+      errorEl.textContent = result.error || '密码错误';
+    }
+  } catch (err) {
+    errorEl.textContent = '网络错误，请重试';
+  }
+  btn.disabled = false;
+  btn.textContent = '登 录';
+}
+
+async function handleLogout() {
+  if (!adminToken) return;
+  if (confirm('确定退出登录吗？')) {
+    try {
+      await fetch('/api/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() }
+      });
+    } catch(e) {}
+    sessionStorage.removeItem(TOKEN_KEY);
+    adminToken = '';
+    document.getElementById('loginOverlay').classList.remove('hidden');
+  }
+}
+
+// 统一 fetch 封装
+async function apiFetch(url, options = {}) {
+  options.headers = { ...(options.headers || {}), ...authHeaders() };
+  const resp = await fetch(url, options);
+  if (resp.status === 401) {
+    // token 失效，回到登录页
+    sessionStorage.removeItem(TOKEN_KEY);
+    adminToken = '';
+    document.getElementById('loginOverlay').classList.remove('hidden');
+    throw new Error('未授权');
+  }
+  return resp;
+}
+
+// ========== 数据管理 ==========
 let cachedData = [];
 
-// 从服务器拉取数据
 async function fetchServerData() {
   try {
-    const resp = await fetch('/api/submissions');
+    const resp = await apiFetch('/api/submissions');
     if (resp.ok) { cachedData = await resp.json(); }
-  } catch (e) { console.warn('获取数据失败，使用缓存'); }
+  } catch (e) { console.warn('获取数据失败'); }
 }
 function getData() { return cachedData; }
 
@@ -353,14 +504,10 @@ const FIELD_LABELS = {
   q20_yn: '第20题（是/否）', q20_reason: '第20题-理由',
 };
 
-function getSubmissions() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
-}
-
 function renderStats(data) {
   document.getElementById('totalCount').textContent = data.length;
   const today = new Date().toLocaleDateString('zh-CN');
-  const todayData = data.filter(d => d._submitTime && d._submitTime.startsWith(today.replace(/\//g, '/')));
+  const todayData = data.filter(d => d._submitTime && d._submitTime.startsWith(today));
   document.getElementById('todayCount').textContent = todayData.length;
   const units = new Set(data.map(d => d.unit).filter(Boolean));
   document.getElementById('unitCount').textContent = units.size;
@@ -545,7 +692,7 @@ function importJSON() {
   document.getElementById('importFile').click();
 }
 
-function handleImport(input) {
+async function handleImport(input) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
@@ -553,7 +700,7 @@ function handleImport(input) {
     try {
       const imported = JSON.parse(e.target.result);
       if (!Array.isArray(imported)) throw new Error('格式错误');
-      const resp = await fetch('/api/import', {
+      const resp = await apiFetch('/api/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(imported)
@@ -562,7 +709,7 @@ function handleImport(input) {
       renderTable();
       alert(`导入成功！新增 ${result.added} 条记录。`);
     } catch(err) {
-      alert('导入失败，请确认文件格式正确。');
+      alert('导入失败，请确认文件格式正确且已登录。');
     }
   };
   reader.readAsText(file);
@@ -571,15 +718,24 @@ function handleImport(input) {
 
 async function clearAll() {
   if (confirm('确定要清空所有提交数据吗？此操作不可恢复！\n\n建议先点击"备份数据"保存后再清空。')) {
-    await fetch('/api/submissions', { method: 'DELETE' });
-    renderTable();
+    try {
+      await apiFetch('/api/submissions', { method: 'DELETE' });
+      renderTable();
+    } catch(e) {
+      alert('操作失败，请确认已登录。');
+    }
   }
 }
 
-// 初始化
-renderTable();
+// ========== 初始化 ==========
+if (adminToken) {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  renderTable();
+}
 // 每30秒自动刷新
-setInterval(renderTable, 30000);
+setInterval(() => {
+  if (adminToken) renderTable();
+}, 30000);
 </script>
 </body>
 </html>
