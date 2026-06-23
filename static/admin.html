@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>调查问卷统计后台</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Microsoft YaHei", Arial, sans-serif;
+      background: #f0f4fa;
+      color: #222;
+      min-height: 100vh;
+    }
+    .header {
+      background: #1a3a6c;
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 { font-size: 18px; font-weight: 700; }
+    .header .back-link { color: #93c5fd; text-decoration: none; font-size: 13px; }
+    .header .back-link:hover { color: #fff; }
+
+    .content { max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; }
+
+    /* 统计卡片 */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      text-align: center;
+    }
+    .stat-card .num { font-size: 36px; font-weight: 700; color: #1a56db; line-height: 1.1; }
+    .stat-card .label { font-size: 13px; color: #666; margin-top: 6px; }
+
+    /* 批量导入区域 */
+    .import-banner {
+      background: linear-gradient(90deg, #1a56db, #2563eb);
+      border-radius: 10px;
+      padding: 18px 22px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(26,86,219,0.2);
+    }
+    .import-banner .text { font-size: 14px; line-height: 1.6; }
+    .import-banner .text strong { font-size: 15px; }
+    .import-banner .btn-import {
+      background: #fff;
+      color: #1a56db;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .import-banner .btn-import:hover { background: #eff6ff; }
+
+    /* 工具栏 */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .toolbar input[type="text"] {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 13px;
+      width: 220px;
+    }
+    .btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .btn-primary { background: #1a56db; color: #fff; }
+    .btn-primary:hover { background: #1446b5; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-success { background: #16a34a; color: #fff; }
+    .btn-success:hover { background: #15803d; }
+    .btn-gray { background: #e5e7eb; color: #444; }
+    .btn-gray:hover { background: #d1d5db; }
+
+    /* 表格 */
+    .table-wrap {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .table-title {
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      border-bottom: 1px solid #e4e8f0;
+      background: #fafbff;
+      color: #1a3a6c;
+    }
+    .table-scroll { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      background: #f1f5fd;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: #1a3a6c;
+      border-bottom: 1px solid #e4e8f0;
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f0f2f7;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8faff; }
+    .badge-yes {
+      background: #dcfce7;
+      color: #166534;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-no {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-empty {
+      color: #aaa;
+      font-style: italic;
+    }
+    .reason-text {
+      max-width: 200px;
+      word-break: break-all;
+      color: #666;
+      font-size: 12px;
+    }
+
+    /* 详情弹窗 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      max-width: 780px;
+      width: 96%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+    }
+    .modal h2 { font-size: 17px; color: #1a3a6c; margin-bottom: 20px; }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #888;
+      background: none;
+      border: none;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 24px;
+    }
+    @media (max-width: 500px) { .detail-grid { grid-template-columns: 1fr; } }
+    .detail-item { font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0f2f7; }
+    .detail-item .dk { color: #888; font-size: 12px; }
+    .detail-item .dv { color: #222; font-weight: 500; margin-top: 2px; }
+
+    .section-head {
+      grid-column: 1/-1;
+      background: #f1f5fd;
+      color: #1a3a6c;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aaa;
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* 图表区域 */
+    .charts-section { margin-bottom: 32px; }
+    .chart-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .chart-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 20px;
+    }
+    .chart-card h3 { font-size: 13px; color: #1a3a6c; margin-bottom: 16px; font-weight: 600; }
+    .yn-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .yn-segment {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .yn-segment .bar-wrap {
+      width: 48px;
+      height: 80px;
+      background: #f0f4fa;
+      border-radius: 6px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+    .yn-segment .bar-fill {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+      transition: height 0.4s;
+    }
+    .yn-segment .bar-num { font-size: 16px; font-weight: 700; }
+    .yn-segment .bar-label { font-size: 11px; color: #888; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1a3a6c;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-size: 13px;
+      z-index: 200;
+      display: none;
+    }
+    .toast.show { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 调查问卷统计后台</h1>
+  <a href="index.html" class="back-link">← 返回问卷填写</a>
+</div>
+
+<div class="content">
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card">
+      <div class="num" id="totalCount">0</div>
+      <div class="label">总提交数</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="todayCount">0</div>
+      <div class="label">今日新增</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="unitCount">0</div>
+      <div class="label">参与单位数</div>
+    </div>
+  </div>
+
+  <!-- 批量导入答卷 -->
+  <div class="import-banner">
+    <div class="text">
+      <strong>📥 批量导入答卷</strong><br>
+      请选择各单位导出的 JSON 答卷文件，支持一次选择多个文件。导入后将与本机已有数据合并保存。
+    </div>
+    <button class="btn-import" onclick="importJSON()">选择 JSON 文件导入</button>
+  </div>
+
+  <!-- 是/否统计图表 -->
+  <div class="charts-section">
+    <div class="chart-row" id="ynCharts"></div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="按单位/联系人搜索…" oninput="renderTable()">
+    <button class="btn btn-gray" onclick="renderTable()">🔄 刷新数据</button>
+    <button class="btn btn-success" onclick="exportCSV()">⬇ 导出 CSV</button>
+    <button class="btn btn-gray" onclick="exportJSON()">💾 备份数据</button>
+    <button class="btn btn-danger" onclick="clearAll()">🗑 清空数据</button>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-title">提交记录列表</div>
+    <div class="table-scroll">
+      <div id="tableContainer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <h2>📋 问卷详情</h2>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- 隐藏的文件导入input（多选） -->
+<input type="file" id="importFile" accept=".json" multiple style="display:none" onchange="handleImport(this)">
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'cx_survey_submissions';
+
+function getSubmissions() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveSubmissions(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    return true;
+  } catch(e) {
+    showToast('保存失败：浏览器存储空间不足或禁止访问 localStorage');
+    return false;
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// 是/否题目定义
+const YN_QUESTIONS = [
+  { key: 'q1_yn', label: '第1题：联合治理工作机制' },
+  { key: 'q2_yn', label: '第2题：年度考核机制' },
+  { key: 'q3_yn', label: '第3题：重点货运源头名录' },
+  { key: 'q8_yn', label: '第8题：部门联合执法机制' },
+  { key: 'q10_yn', label: '第10题：高速公路及时报告' },
+  { key: 'q15_yn', label: '第15题：机动车检验机构报告' },
+  { key: 'q17_yn', label: '第17题：信用档案建立' },
+  { key: 'q20_yn', label: '第20题：设备具备三维检测功能' },
+];
+
+// 字段中文标签映射
+const FIELD_LABELS = {
+  unit: '填写单位', contact: '联系人', phone: '联系电话',
+  _submitTime: '提交时间',
+  q1_yn: '第1题（是/否）', q1_reason: '第1题-原因',
+  q2_yn: '第2题（是/否）', q2_reason: '第2题-原因',
+  q3_yn: '第3题（是/否）', q3_count: '第3题-源头单位数量', q3_reason: '第3题-理由',
+  q4_installed: '第4题-已安装设备(家)', q4_connected: '第4题-接入平台(家)',
+  q5_detected: '第5题-检测发现违法车次', q5_penalty: '第5题-处罚件数', q5_over75: '第5题-超75吨', q5_bayton: '第5题-百吨王',
+  q6_stations: '第6题-固定站点(个)', q6_traffic_staff: '第6题-执法人员(名/站)', q6_police: '第6题-交警(名/站)', q6_time_start: '第6题-在岗开始(时)', q6_time_end: '第6题-在岗结束(时)',
+  q7_total: '第7题-查处件数', q7_over75: '第7题-超75吨', q7_bayton: '第7题-百吨王', q7_one4: '第7题-一超四罚',
+  q8_yn: '第8题（是/否）', q8_times: '第8题-联合执法次数', q8_duration: '第8题-每次时长(月)', q8_persons: '第8题-派出人次', q8_total: '第8题-查处件数', q8_over75: '第8题-超75吨', q8_bayton: '第8题-百吨王', q8_one4: '第8题-一超四罚', q8_reason: '第8题-原因',
+  q9_entrances: '第9题-入口处数', q9_lanes: '第9题-入口车道数', q9_equipped_entrances: '第9题-安装设备入口(处)', q9_equipped_lanes: '第9题-安装设备车道(条)', q9_intact_rate: '第9题-设备完好率(%)',
+  q10_yn: '第10题（是/否）', q10_minutes: '第10题-到达时间(分钟)', q10_reason: '第10题-理由',
+  q11_operator: '第11题-查处经营者放行(件)', q11_entry: '第11题-查处拟入高速(件)',
+  q12_locations: '第12题-监控设备处数', q12_lanes: '第12题-车道数', q12_pass_rate: '第12题-检定通过率(%)',
+  q13_collected: '第13题-收集数据条数', q13_evidence_rate: '第13题-达证据标准(%)', q13_notified: '第13题-告知车主(条)', q13_voluntary: '第13题-主动接受处罚(件)', q13_penalized: '第13题-依据数据处罚(件)', q13_unhandled: '第13题-未处理(条)', q13_unhandled_reason: '第13题-未处理原因',
+  q14_total: '第14题-复议诉讼(件)', q14_lost: '第14题-败议败诉(件)',
+  q15_yn: '第15题（是/否）', q15_minutes: '第15题-到场时间(分钟)', q15_reason: '第15题-理由',
+  q16_total: '第16题-查处件数',
+  q17_yn: '第17题（是/否）', q17_records: '第17题-不良信用信息(条)', q17_reason: '第17题-理由',
+  q18_pushed: '第18题-推送信息(条)',
+  q19_cases: '第19题-处罚案件(件)',
+  q20_yn: '第20题（是/否）', q20_reason: '第20题-理由',
+};
+
+function renderStats(data) {
+  document.getElementById('totalCount').textContent = data.length;
+  const today = new Date().toLocaleDateString('zh-CN');
+  const todayData = data.filter(d => d._submitTime && d._submitTime.startsWith(today.replace(/\//g, '/')));
+  document.getElementById('todayCount').textContent = todayData.length;
+  const units = new Set(data.map(d => d.unit).filter(Boolean));
+  document.getElementById('unitCount').textContent = units.size;
+}
+
+function renderYNCharts(data) {
+  const container = document.getElementById('ynCharts');
+  if (data.length === 0) { container.innerHTML = ''; return; }
+  let html = '';
+  YN_QUESTIONS.forEach(q => {
+    const yesCount = data.filter(d => d[q.key] === 'yes').length;
+    const noCount = data.filter(d => d[q.key] === 'no').length;
+    const total = yesCount + noCount;
+    const yesH = total > 0 ? Math.round((yesCount / total) * 80) : 0;
+    const noH = total > 0 ? Math.round((noCount / total) * 80) : 0;
+    html += `
+      <div class="chart-card">
+        <h3>${q.label}</h3>
+        <div class="yn-bar">
+          <div class="yn-segment">
+            <div class="bar-wrap">
+              <div class="bar-fill" style="background:#16a34a;height:${yesH}px"></div>
+            </div>
+            <div class="bar-num" style="color:#16a34a">${yesCount}</div>
+            <div class="bar-label">是</div>
+          </div>
+          <div class="yn-segment">
+            <div class="bar-wrap">
+              <div class="bar-fill" style="background:#dc2626;height:${noH}px"></div>
+            </div>
+            <div class="bar-num" style="color:#dc2626">${noCount}</div>
+            <div class="bar-label">否</div>
+          </div>
+          <div class="yn-segment">
+            <div class="bar-wrap">
+              <div class="bar-fill" style="background:#aab4c8;height:${(80-yesH-noH) > 0 ? 80-yesH-noH : 0}px"></div>
+            </div>
+            <div class="bar-num" style="color:#aaa">${data.length - yesCount - noCount}</div>
+            <div class="bar-label">未填</div>
+          </div>
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderTable() {
+  const data = getSubmissions();
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = search
+    ? data.filter(d => (d.unit||'').toLowerCase().includes(search) || (d.contact||'').toLowerCase().includes(search))
+    : data;
+
+  renderStats(data);
+  renderYNCharts(data);
+
+  if (filtered.length === 0) {
+    document.getElementById('tableContainer').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📭</div>
+        <div>${data.length === 0 ? '暂无提交记录，请通过上方“批量导入答卷”导入 JSON 文件。' : '未找到匹配的记录。'}</div>
+      </div>`;
+    return;
+  }
+
+  let rows = filtered.map((d, i) => {
+    const ynBadge = (val) => val === 'yes'
+      ? '<span class="badge-yes">是</span>'
+      : val === 'no' ? '<span class="badge-no">否</span>'
+      : '<span class="badge-empty">未填</span>';
+
+    return `<tr>
+      <td>${filtered.length - i}</td>
+      <td>${d.unit || '<span class="badge-empty">未填</span>'}</td>
+      <td>${d.contact || ''}</td>
+      <td>${d.phone || ''}</td>
+      <td>${ynBadge(d.q1_yn)}</td>
+      <td>${ynBadge(d.q2_yn)}</td>
+      <td>${ynBadge(d.q3_yn)}</td>
+      <td>${ynBadge(d.q8_yn)}</td>
+      <td>${ynBadge(d.q17_yn)}</td>
+      <td>${d._submitTime || ''}</td>
+      <td><button class="btn btn-primary" style="padding:4px 10px;font-size:12px" onclick="showDetail(${data.indexOf(d)})">详情</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tableContainer').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>填写单位</th>
+          <th>联系人</th>
+          <th>联系电话</th>
+          <th>Q1联合机制</th>
+          <th>Q2年度考核</th>
+          <th>Q3源头名录</th>
+          <th>Q8联合执法</th>
+          <th>Q17信用档案</th>
+          <th>提交时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function showDetail(idx) {
+  const data = getSubmissions();
+  const d = data[idx];
+  if (!d) return;
+
+  const sections = [
+    { title: '基本信息', keys: ['unit','contact','phone','_submitTime'] },
+    { title: '二、超限治理工作机制', keys: ['q1_yn','q1_reason','q2_yn','q2_reason'] },
+    { title: '三、重点货运源头治超', keys: ['q3_yn','q3_count','q3_reason','q4_installed','q4_connected','q5_detected','q5_penalty','q5_over75','q5_bayton'] },
+    { title: '四、固定检测站点治超', keys: ['q6_stations','q6_traffic_staff','q6_police','q6_time_start','q6_time_end','q7_total','q7_over75','q7_bayton','q7_one4'] },
+    { title: '五、联合流动检测治超', keys: ['q8_yn','q8_times','q8_duration','q8_persons','q8_total','q8_over75','q8_bayton','q8_one4','q8_reason'] },
+    { title: '六、高速公路入口检测治超', keys: ['q9_entrances','q9_lanes','q9_equipped_entrances','q9_equipped_lanes','q9_intact_rate','q10_yn','q10_minutes','q10_reason','q11_operator','q11_entry'] },
+    { title: '七、重要路段非现场治超', keys: ['q12_locations','q12_lanes','q12_pass_rate','q13_collected','q13_evidence_rate','q13_notified','q13_voluntary','q13_penalized','q13_unhandled','q13_unhandled_reason','q14_total','q14_lost'] },
+    { title: '八、外部协同治超', keys: ['q15_yn','q15_minutes','q15_reason','q16_total'] },
+    { title: '九、信用管理', keys: ['q17_yn','q17_records','q17_reason'] },
+    { title: '十、其他方面', keys: ['q18_pushed','q19_cases','q20_yn','q20_reason'] },
+  ];
+
+  let html = '<div class="detail-grid">';
+  sections.forEach(s => {
+    html += `<div class="section-head">${s.title}</div>`;
+    s.keys.forEach(k => {
+      const val = d[k];
+      if (val === undefined || val === '') return;
+      const label = FIELD_LABELS[k] || k;
+      let display = val;
+      if (val === 'yes') display = '<span class="badge-yes">是</span>';
+      else if (val === 'no') display = '<span class="badge-no">否</span>';
+      html += `<div class="detail-item">
+        <div class="dk">${label}</div>
+        <div class="dv">${display}</div>
+      </div>`;
+    });
+  });
+  html += '</div>';
+
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay') || !e.target) {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+}
+
+function exportCSV() {
+  const data = getSubmissions();
+  if (data.length === 0) { alert('暂无数据可导出'); return; }
+  const allKeys = Object.keys(FIELD_LABELS);
+  const header = allKeys.map(k => FIELD_LABELS[k] || k);
+  const rows = data.map(d => allKeys.map(k => {
+    const v = d[k] || '';
+    return '"' + String(v).replace(/"/g, '""') + '"';
+  }));
+  const csv = '\uFEFF' + [header.map(h => '"'+h+'"'), ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '超限运输问卷统计_' + new Date().toLocaleDateString('zh-CN').replace(/\//g,'-') + '.csv';
+  a.click();
+}
+
+function exportJSON() {
+  const data = getSubmissions();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '超限运输问卷备份_' + Date.now() + '.json';
+  a.click();
+}
+
+function importJSON() {
+  document.getElementById('importFile').click();
+}
+
+function normalizeRecords(parsed) {
+  if (Array.isArray(parsed)) return parsed.filter(isValidRecord);
+  if (isValidRecord(parsed)) return [parsed];
+  return [];
+}
+
+function isValidRecord(item) {
+  return item && typeof item === 'object' && (item.unit || item.contact || item.phone || item.q1_yn || item.q2_yn);
+}
+
+function handleImport(input) {
+  const files = Array.from(input.files || []);
+  if (files.length === 0) return;
+
+  let importedCount = 0;
+  let processedCount = 0;
+  const allImported = [];
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        const records = normalizeRecords(parsed);
+        records.forEach(r => {
+          if (!r._submitTime) r._submitTime = new Date().toLocaleString('zh-CN');
+          if (!r._id) r._id = 'import_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+          allImported.push(r);
+        });
+        importedCount += records.length;
+      } catch(err) {
+        console.warn('文件解析失败', file.name, err);
+      }
+      processedCount++;
+      if (processedCount === files.length) {
+        finishImport(allImported, importedCount);
+      }
+    };
+    reader.onerror = function() {
+      processedCount++;
+      if (processedCount === files.length) {
+        finishImport(allImported, importedCount);
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  input.value = '';
+}
+
+function finishImport(records, count) {
+  if (count === 0) {
+    alert('导入失败，未找到有效的答卷数据。请确认文件为 JSON 格式且包含问卷字段。');
+    return;
+  }
+  const current = getSubmissions();
+  const merged = current.concat(records);
+  if (saveSubmissions(merged)) {
+    renderTable();
+    showToast(`导入成功！共新增 ${count} 条答卷。`);
+  }
+}
+
+function clearAll() {
+  if (confirm('确定要清空所有提交数据吗？此操作不可恢复！\n\n建议先点击"备份数据"保存后再清空。')) {
+    localStorage.removeItem(STORAGE_KEY);
+    renderTable();
+  }
+}
+
+// 初始化
+renderTable();
+</script>
+</body>
+</html>
