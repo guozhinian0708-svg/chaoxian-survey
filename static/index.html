@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>《宁波市公路超限运输管理实施规定》执行情况调查问卷</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif;
+      background: #f4f6fa;
+      color: #222;
+      min-height: 100vh;
+    }
+    .page-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+    .form-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.09);
+      padding: 40px 48px;
+    }
+    @media (max-width: 600px) {
+      .form-card { padding: 24px 16px; }
+    }
+    .form-header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid #1a56db;
+    }
+    .form-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a3a6c;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .form-header .subtitle {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.8;
+      text-align: left;
+    }
+    .static-notice {
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #1e40af;
+      line-height: 1.7;
+      text-align: left;
+    }
+    .static-notice strong { color: #1d4ed8; }
+    .section-title {
+      background: #1a56db;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      margin: 28px 0 16px;
+    }
+    .base-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 600px) {
+      .base-info { grid-template-columns: 1fr; }
+    }
+    .base-info .field-group label {
+      display: block;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    .base-info .field-group input {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 14px;
+    }
+
+    .question-block {
+      border: 1px solid #e4e8f0;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      background: #fafbff;
+      transition: box-shadow 0.2s;
+    }
+    .question-block:hover { box-shadow: 0 2px 8px rgba(26,86,219,0.08); }
+    .q-label {
+      font-size: 14px;
+      color: #222;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    .q-label .q-num {
+      font-weight: 700;
+      color: #1a56db;
+      margin-right: 4px;
+    }
+
+    /* 是否单选 */
+    .yn-group {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+    .yn-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #444;
+      user-select: none;
+    }
+    .yn-option input[type="radio"] { display: none; }
+    .yn-option .radio-custom {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #aab4c8;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.2s;
+    }
+    .yn-option input[type="radio"]:checked + .radio-custom {
+      border-color: #1a56db;
+    }
+    .yn-option input[type="radio"]:checked + .radio-custom::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: #1a56db;
+      border-radius: 50%;
+    }
+    .yn-option.yes input[type="radio"]:checked + .radio-custom { border-color: #16a34a; }
+    .yn-option.yes input[type="radio"]:checked + .radio-custom::after { background: #16a34a; }
+    .yn-option.no input[type="radio"]:checked + .radio-custom { border-color: #dc2626; }
+    .yn-option.no input[type="radio"]:checked + .radio-custom::after { background: #dc2626; }
+
+    /* 否-原因区域 */
+    .no-reason-area {
+      display: none;
+      margin-top: 12px;
+      background: #fff8f8;
+      border: 1px dashed #dc2626;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .no-reason-area.visible { display: block; }
+    .no-reason-area label {
+      font-size: 13px;
+      color: #dc2626;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .no-reason-area textarea {
+      width: 100%;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #333;
+      resize: vertical;
+      min-height: 60px;
+      font-family: inherit;
+    }
+    .no-reason-area textarea:focus {
+      outline: none;
+      border-color: #dc2626;
+    }
+
+    /* 是-子内容区域 */
+    .yes-content-area {
+      display: none;
+      margin-top: 12px;
+      background: #f0fdf4;
+      border: 1px dashed #16a34a;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .yes-content-area.visible { display: block; }
+
+    /* 数字/文本填写区域 */
+    .fill-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .fill-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .fill-item label {
+      font-size: 12px;
+      color: #555;
+      font-weight: 500;
+    }
+    .fill-item input[type="text"],
+    .fill-item input[type="number"] {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 14px;
+      width: 100%;
+      font-family: inherit;
+    }
+    .fill-item input:focus { outline: none; border-color: #1a56db; }
+
+    /* 纯填写题（无是否） */
+    .fill-only-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .fill-only-grid .fill-item label { color: #444; }
+
+    textarea.full-width {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 56px;
+      font-family: inherit;
+    }
+    textarea.full-width:focus { outline: none; border-color: #1a56db; }
+
+    input[type="text"].inline,
+    input[type="number"].inline {
+      display: inline-block;
+      width: 80px;
+      border: none;
+      border-bottom: 1px solid #666;
+      padding: 2px 4px;
+      font-size: 13px;
+      text-align: center;
+      font-family: inherit;
+    }
+    input[type="text"].inline:focus,
+    input[type="number"].inline:focus { outline: none; border-bottom-color: #1a56db; }
+
+    /* 提交按钮 */
+    .submit-area {
+      text-align: center;
+      margin-top: 40px;
+    }
+    .btn-submit {
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      padding: 13px 56px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: #1446b5; }
+    .btn-submit:active { background: #0f3580; }
+    .btn-submit:disabled { background: #93c5fd; cursor: not-allowed; }
+
+    .btn-export {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #16a34a;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 14px;
+      text-decoration: none;
+    }
+    .btn-export:hover { background: #15803d; }
+    .btn-export:active { background: #14532d; }
+
+    /* 成功提示 */
+    .success-msg {
+      display: none;
+      background: #f0fdf4;
+      border: 1px solid #16a34a;
+      border-radius: 8px;
+      padding: 20px 24px;
+      text-align: center;
+      color: #166534;
+      font-size: 15px;
+      margin-top: 16px;
+    }
+    .success-msg.show { display: block; }
+    .success-msg .hint {
+      font-size: 14px;
+      color: #15803d;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+    .success-msg .hint strong { color: #14532d; }
+
+    /* 后台统计入口 */
+    .admin-link {
+      text-align: right;
+      margin-bottom: 8px;
+    }
+    .admin-link a {
+      font-size: 12px;
+      color: #aaa;
+      text-decoration: none;
+    }
+    .admin-link a:hover { color: #1a56db; }
+
+    /* 必填标记 */
+    .req { color: #dc2626; margin-left: 2px; }
+
+    /* 分割线 */
+    .divider { border: none; border-top: 1px solid #e4e8f0; margin: 4px 0 8px; }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+  <div class="admin-link">
+    <a href="admin.html" target="_blank">📊 查看统计后台</a>
+  </div>
+  <div class="form-card">
+    <div class="form-header">
+      <h1>关于《宁波市公路超限运输管理实施规定》<br>执行情况的调查问卷</h1>
+      <p class="subtitle">
+        为保证《宁波市公路超限运输管理实施规定（修改）》（以下简称《规定》）立法调研质量，根据局立法调研工作方案，课题组组织开展书面调查，请市、区（县、市）交通运输执法队根据本级实际，在调查问卷上"□"内打"√"和在"___"上填写相应内容。
+      </p>
+    </div>
+
+    <div class="static-notice">
+      <strong>使用说明：</strong>本页面为离线静态版，填写并提交后，请手动点击<strong>"导出我的答卷"</strong>按钮下载 JSON 文件，发送给汇总人。如未导出，可返回本页重新提交。
+    </div>
+
+    <form id="surveyForm" novalidate>
+
+      <!-- 基本信息 -->
+      <div class="section-title">一、填写信息</div>
+      <div class="base-info">
+        <div class="field-group">
+          <label>填写单位<span class="req">*</span></label>
+          <input type="text" name="unit" placeholder="请填写单位全称" required>
+        </div>
+        <div class="field-group">
+          <label>联系人<span class="req">*</span></label>
+          <input type="text" name="contact" placeholder="请填写姓名" required>
+        </div>
+        <div class="field-group">
+          <label>联系电话<span class="req">*</span></label>
+          <input type="text" name="phone" placeholder="请填写联系电话" required>
+        </div>
+      </div>
+
+      <!-- 第二部分：超限治理工作机制 -->
+      <div class="section-title">二、超限治理工作机制方面</div>
+
+      <!-- Q1 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">1.</span> 本级政府建立了货运车辆超限运输联合治理工作机制，成员单位固定，并保持常态化运作：</div>
+        <div class="yn-group">
+          <label class="yn-option yes">
+            <input type="radio" name="q1_yn" value="yes" onchange="toggleYN('q1', this.value)">
+            <span class="radio-custom"></span>
+            是
+          </label>
+          <label class="yn-option no">
+            <input type="radio" name="q1_yn" value="no" onchange="toggleYN('q1', this.value)">
+            <span class="radio-custom"></span>
+            否
+          </label>
+        </div>
+        <div class="no-reason-area" id="q1_no">
+          <label>请说明主要原因：</label>
+          <textarea name="q1_reason" placeholder="请填写主要原因……"></textarea>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">2.</span> 本级政府每年度对超限治理联合治理成员单位的履职情况进行监督检查和考核：</div>
+        <div class="yn-group">
+          <label class="yn-option yes">
+            <input type="radio" name="q2_yn" value="yes" onchange="toggleYN('q2', this.value)">
+            <span class="radio-custom"></span>
+            是
+          </label>
+          <label class="yn-option no">
+            <input type="radio" name="q2_yn" value="no" onchange="toggleYN('q2', this.value)">
+            <span class="radio-custom"></span>
+            否
+          </label>
+        </div>
+        <div class="no-reason-area" id="q2_no">
+          <label>请说明主要原因：</label>
+          <textarea name="q2_reason" placeholder="请填写主要原因……"></textarea>
+        </div>
+      </div>
+
+      <!-- 第三部分：重点货运源头治超 -->
+      <div class="section-title">三、重点货运源头治超方面</div>
+
+      <!-- Q3 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">3.</span> 市、区（县、市）交通运输主管部门公布了本级管理区域内重点货运源头名录，并实行动态管理：</div>
+        <div class="yn-group">
+          <label class="yn-option yes">
+            <input type="radio" name="q3_yn" value="yes" onchange="toggleYN('q3', this.value)">
+            <span class="radio-custom"></span>
+            是
+          </label>
+          <label class="yn-option no">
+            <input type="radio" name="q3_yn" value="no" onchange="toggleYN('q3', this.value)">
+            <span class="radio-custom"></span>
+            否
+          </label>
+        </div>
+        <div class="yes-content-area" id="q3_yes">
+          <div class="fill-grid">
+            <div class="fill-item">
+              <label>截至2025年底，重点货运源头单位共（家）</label>
+              <input type="number" name="q3_count" min="0" placeholder="请填写数量">
+            </div>
+          </div>
+        </div>
+        <div class="no-reason-area" id="q3_no">
+          <label>请说明主要理由：</label>
+          <textarea name="q3_reason" placeholder="请填写主要理由……"></textarea>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">4.</span> 重点货运源头经营人或管理人依法安装计量称重检测设备并将检测数据接入省超限治理监管平台的情况（截至2025年底）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>已安装称重检测设备（家）</label>
+            <input type="number" name="q4_installed" min="0" placeholder="填写数量">
+          </div>
+          <div class="fill-item">
+            <label>数据接入省超限监管平台（家）</label>
+            <input type="number" name="q4_connected" min="0" placeholder="填写数量">
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">5.</span> 重点货运源头单位违法超限装载情况（2023年1月—2025年12月）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>检测发现违法超限装载（车次）</label>
+            <input type="number" name="q5_detected" min="0" placeholder="填写车次">
+          </div>
+          <div class="fill-item">
+            <label>作出处罚决定（件）</label>
+            <input type="number" name="q5_penalty" min="0" placeholder="填写件数">
+          </div>
+          <div class="fill-item">
+            <label>其中：超75吨（件）</label>
+            <input type="number" name="q5_over75" min="0" placeholder="填写件数">
+          </div>
+          <div class="fill-item">
+            <label>其中："百吨王"（件）</label>
+            <input type="number" name="q5_bayton" min="0" placeholder="填写件数">
+          </div>
+        </div>
+      </div>
+
+      <!-- 第四部分：固定检测站点治超 -->
+      <div class="section-title">四、固定检测站点治超方面</div>
+
+      <!-- Q6 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">6.</span> 本级管理区域内固定超限运输检测站点情况：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>固定检测站点（个）</label>
+            <input type="number" name="q6_stations" min="0" placeholder="填写数量">
+          </div>
+          <div class="fill-item">
+            <label>每站点配备交通运输执法人员（名）</label>
+            <input type="number" name="q6_traffic_staff" min="0" placeholder="填写人数">
+          </div>
+          <div class="fill-item">
+            <label>每站点配备公安交警（名）</label>
+            <input type="number" name="q6_police" min="0" placeholder="填写人数">
+          </div>
+          <div class="fill-item">
+            <label>每日在岗检测时间：从（时）</label>
+            <input type="text" name="q6_time_start" placeholder="如：8">
+          </div>
+          <div class="fill-item">
+            <label>每日在岗检测时间：至（时）</label>
+            <input type="text" name="q6_time_end" placeholder="如：20">
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">7.</span> 公路上固定超限运输检测站点查处违法超限运输情况（2023年1月—2025年12月）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>查处违法超限运输行为（件）</label>
+            <input type="number" name="q7_total" min="0" placeholder="填写件数">
+          </div>
+          <div class="fill-item">
+            <label>其中：超75吨（件）</label>
+            <input type="number" name="q7_over75" min="0" placeholder="填写件数">
+          </div>
+          <div class="fill-item">
+            <label>其中："百吨王"（件）</label>
+            <input type="number" name="q7_bayton" min="0" placeholder="填写件数">
+          </div>
+          <div class="fill-item">
+            <label>其中："一超四罚"（件）</label>
+            <input type="number" name="q7_one4" min="0" placeholder="填写件数">
+          </div>
+        </div>
+      </div>
+
+      <!-- 第五部分：联合流动检测治超 -->
+      <div class="section-title">五、交通运输、公安交警等部门联合流动检测治超方面</div>
+
+      <!-- Q8 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">8.</span> 本级政府建立部门联合执法工作机制，联合开展超限运输流动检测，查处违法超限运输行为：</div>
+        <div class="yn-group">
+          <label class="yn-option yes">
+            <input type="radio" name="q8_yn" value="yes" onchange="toggleYN('q8', this.value)">
+            <span class="radio-custom"></span>
+            是
+          </label>
+          <label class="yn-option no">
+            <input type="radio" name="q8_yn" value="no" onchange="toggleYN('q8', this.value)">
+            <span class="radio-custom"></span>
+            否
+          </label>
+        </div>
+        <div class="yes-content-area" id="q8_yes">
+          <p style="font-size:13px;color:#166534;margin-bottom:10px;">2023年1月—2025年12月期间：</p>
+          <div class="fill-grid">
+            <div class="fill-item">
+              <label>共组织联合流动执法（次）</label>
+              <input type="number" name="q8_times" min="0" placeholder="填写次数">
+            </div>
+            <div class="fill-item">
+              <label>每次持续时长（月）</label>
+              <input type="number" name="q8_duration" min="0" placeholder="填写月数">
+            </div>
+            <div class="fill-item">
+              <label>派出执法人员（人次）</label>
+              <input type="number" name="q8_persons" min="0" placeholder="填写人次">
+            </div>
+            <div class="fill-item">
+              <label>查处违法超限运输（件）</label>
+              <input type="number" name="q8_total" min="0" placeholder="填写件数">
+            </div>
+            <div class="fill-item">
+              <label>其中：超75吨（件）</label>
+              <input type="number" name="q8_over75" min="0" placeholder="填写件数">
+            </div>
+            <div class="fill-item">
+              <label>其中："百吨王"（件）</label>
+              <input type="number" name="q8_bayton" min="0" placeholder="填写件数">
+            </div>
+            <div class="fill-item">
+              <label>其中："一超四罚"（件）</label>
+              <input type="number" name="q8_one4" min="0" placeholder="填写件数">
+            </div>
+          </div>
+        </div>
+        <div class="no-reason-area" id="q8_no">
+          <label>请说明主要原因：</label>
+          <textarea name="q8_reason" placeholder="请填写主要原因……"></textarea>
+        </div>
+      </div>
+
+      <!-- 第六部分：高速公路入口检测治超 -->
+      <div class="section-title">六、高速公路入口检测治超方面</div>
+
+      <!-- Q9 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">9.</span> 本级管辖区域内高速公路入口情况（截至2025年底）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>高速公路入口共（处）</label>
+            <input type="number" name="q9_entrances" min="0" placeholder="填写处数">
+          </div>
+          <div class="fill-item">
+            <label>入口共（车道）</label>
+            <input type="number" name="q9_lanes" min="0" placeholder="填写车道数">
+          </div>
+          <div class="fill-item">
+            <label>安装检测设备的入口（处）</label>
+            <input type="number" name="q9_equipped_entrances" min="0" placeholder="填写处数">
+          </div>
+          <div class="fill-item">
+            <label>安装检测设备的车道（条）</label>
+            <input type="number" name="q9_equipped_lanes" min="0" placeholder="填写条数">
+          </div>
+          <div class="fill-item">
+            <label>设备完好率（%）</label>
+            <input type="number" name="q9_intact_rate" min="0" max="100" placeholder="填写百分比">
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">10.</span> 高速公路经营管理者发现违法超限运输车辆进入时，是否能够及时报告交通运输执法机构：</div>
+        <div class="yn-group">
+          <label class="yn-option yes">
+            <input type="radio" name="q10_yn" value="yes" onchange="toggleYN('q10', this.value)">
+            <span class="radio-custom"></span>
+            是
+          </label>
+          <label class="yn-option no">
+            <input type="radio" name="q10_yn" value="no" onchange="toggleYN('q10', this.value)">
+            <span class="radio-custom"></span>
+            否
+          </label>
+        </div>
+        <div class="yes-content-area" id="q10_yes">
+          <div class="fill-grid">
+            <div class="fill-item">
+              <label>执法人员接报后一般可在（分钟）内到达现场</label>
+              <input type="number" name="q10_minutes" min="0" placeholder="填写分钟数">
+            </div>
+          </div>
+        </div>
+        <div class="no-reason-area" id="q10_no">
+          <label>请说明主要理由：</label>
+          <textarea name="q10_reason" placeholder="请填写主要理由……"></textarea>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">11.</span> 高速公路违法超限查处情况（2023年1月—2025年12月）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>查处高速公路经营管理者放行违法超限行为（件）</label>
+            <input type="number" name="q11_operator" min="0" placeholder="填写件数">
+          </div>
+          <div class="fill-item">
+            <label>查处拟进入高速公路的违法超限行为（件）</label>
+            <input type="number" name="q11_entry" min="0" placeholder="填写件数">
+          </div>
+        </div>
+      </div>
+
+      <!-- 第七部分：重要路段非现场治超 -->
+      <div class="section-title">七、重要路段非现场治超方面</div>
+
+      <!-- Q12 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">12.</span> 普通公路重要路段超限检测技术监控设备设置情况（截至2025年底）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>设置检测技术监控设备（处）</label>
+            <input type="number" name="q12_locations" min="0" placeholder="填写处数">
+          </div>
+          <div class="fill-item">
+            <label>共（车道）</label>
+            <input type="number" name="q12_lanes" min="0" placeholder="填写车道数">
+          </div>
+          <div class="fill-item">
+            <label>设备检定通过率（%）</label>
+            <input type="number" name="q12_pass_rate" min="0" max="100" placeholder="填写百分比">
+          </div>
+        </div>
+      </div>
+
+      <!-- Q13 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">13.</span> 非现场检测数据处理情况（2023年1月—2025年12月）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>检测记录收集的违法超限数据（条）</label>
+            <input type="number" name="q13_collected" min="0" placeholder="填写条数">
+          </div>
+          <div class="fill-item">
+            <label>达到处罚证据标准的占比（%）</label>
+            <input type="number" name="q13_evidence_rate" min="0" max="100" placeholder="填写百分比">
+          </div>
+          <div class="fill-item">
+            <label>按规定告知车辆所有权人（条）</label>
+            <input type="number" name="q13_notified" min="0" placeholder="填写条数">
+          </div>
+          <div class="fill-item">
+            <label>当事人主动接受处罚（件）</label>
+            <input type="number" name="q13_voluntary" min="0" placeholder="填写件数">
+          </div>
+          <div class="fill-item">
+            <label>执法机构依据检测数据作出处罚（件）</label>
+            <input type="number" name="q13_penalized" min="0" placeholder="填写件数">
+          </div>
+          <div class="fill-item">
+            <label>未对检测数据进行处理（条）</label>
+            <input type="number" name="q13_unhandled" min="0" placeholder="填写条数">
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <label style="font-size:13px;color:#555;font-weight:500;display:block;margin-bottom:6px;">未处理的主要理由：</label>
+          <textarea class="full-width" name="q13_unhandled_reason" placeholder="请填写未处理的主要理由……"></textarea>
+        </div>
+      </div>
+
+      <!-- Q14 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">14.</span> 违法超限运输当事人不服依据检测数据作出的处罚决定，申请行政复议、提起行政诉讼情况（2023年1月—2025年12月）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>申请行政复议或提起行政诉讼（件）</label>
+            <input type="number" name="q14_total" min="0" placeholder="填写件数">
+          </div>
+          <div class="fill-item">
+            <label>其中败议、败诉（件）</label>
+            <input type="number" name="q14_lost" min="0" placeholder="填写件数">
+          </div>
+        </div>
+      </div>
+
+      <!-- 第八部分：外部协同治超 -->
+      <div class="section-title">八、外部协同治超方面</div>
+
+      <!-- Q15 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">15.</span> 机动车管理机构、机动车安全技术检验机构在履行职责过程中，发现货运车辆存在涉嫌违法超限运输检测记录的，是否能够立即向交通运输执法机构报告：</div>
+        <div class="yn-group">
+          <label class="yn-option yes">
+            <input type="radio" name="q15_yn" value="yes" onchange="toggleYN('q15', this.value)">
+            <span class="radio-custom"></span>
+            是
+          </label>
+          <label class="yn-option no">
+            <input type="radio" name="q15_yn" value="no" onchange="toggleYN('q15', this.value)">
+            <span class="radio-custom"></span>
+            否
+          </label>
+        </div>
+        <div class="yes-content-area" id="q15_yes">
+          <div class="fill-grid">
+            <div class="fill-item">
+              <label>执法机构接报后一般可在（分钟）内到现场处理</label>
+              <input type="number" name="q15_minutes" min="0" placeholder="填写分钟数">
+            </div>
+          </div>
+        </div>
+        <div class="no-reason-area" id="q15_no">
+          <label>请说明主要理由：</label>
+          <textarea name="q15_reason" placeholder="请填写主要理由……"></textarea>
+        </div>
+      </div>
+
+      <!-- Q16 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">16.</span> 交通运输执法机构根据机动车管理机构、机动车安全技术检验机构报告信息查处情况（2023年1月—2025年12月）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>查处违法超限运输行为（件）</label>
+            <input type="number" name="q16_total" min="0" placeholder="填写件数">
+          </div>
+        </div>
+      </div>
+
+      <!-- 第九部分：信用管理 -->
+      <div class="section-title">九、违法超限运输信用管理方面</div>
+
+      <!-- Q17 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">17.</span> 交通运输运输管理部门是否建立重点货运源头的经营人或管理人、高速公路经营管理人、违法超限运输行为人的信用档案：</div>
+        <div class="yn-group">
+          <label class="yn-option yes">
+            <input type="radio" name="q17_yn" value="yes" onchange="toggleYN('q17', this.value)">
+            <span class="radio-custom"></span>
+            是
+          </label>
+          <label class="yn-option no">
+            <input type="radio" name="q17_yn" value="no" onchange="toggleYN('q17', this.value)">
+            <span class="radio-custom"></span>
+            否
+          </label>
+        </div>
+        <div class="yes-content-area" id="q17_yes">
+          <div class="fill-grid">
+            <div class="fill-item">
+              <label>2023年1月—2025年12月，依法记录当事人不良信用信息（条）</label>
+              <input type="number" name="q17_records" min="0" placeholder="填写条数">
+            </div>
+          </div>
+        </div>
+        <div class="no-reason-area" id="q17_no">
+          <label>请说明主要理由：</label>
+          <textarea name="q17_reason" placeholder="请填写主要理由……"></textarea>
+        </div>
+      </div>
+
+      <!-- 第十部分：其他方面 -->
+      <div class="section-title">十、其他方面</div>
+
+      <!-- Q18 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">18.</span> 向公安交警部门推送货运车辆在超限运输检测技术监控技术区域内违反交通标志、标线行驶的信息情况（2023年1月—2025年12月）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>推送信息（条）</label>
+            <input type="number" name="q18_pushed" min="0" placeholder="填写条数">
+          </div>
+        </div>
+      </div>
+
+      <!-- Q19 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">19.</span> 查处损坏、擅自移动或遮挡公路上车辆超限运输检测技术监控设备的处罚案件情况（2023年1月—2025年12月）：</div>
+        <div class="fill-only-grid">
+          <div class="fill-item">
+            <label>处罚案件（件）</label>
+            <input type="number" name="q19_cases" min="0" placeholder="填写件数">
+          </div>
+        </div>
+      </div>
+
+      <!-- Q20 -->
+      <div class="question-block">
+        <div class="q-label"><span class="q-num">20.</span> 在普通公路的重要路段设置的车辆超限运输检测技术监控设备，是否具备了检测车辆总长度、总宽度和总高度的功能：</div>
+        <div class="yn-group">
+          <label class="yn-option yes">
+            <input type="radio" name="q20_yn" value="yes" onchange="toggleYN('q20', this.value)">
+            <span class="radio-custom"></span>
+            是
+          </label>
+          <label class="yn-option no">
+            <input type="radio" name="q20_yn" value="no" onchange="toggleYN('q20', this.value)">
+            <span class="radio-custom"></span>
+            否
+          </label>
+        </div>
+        <div class="no-reason-area" id="q20_no">
+          <label>请说明主要理由：</label>
+          <textarea name="q20_reason" placeholder="请填写主要理由……"></textarea>
+        </div>
+      </div>
+
+      <div class="submit-area">
+        <button type="submit" class="btn-submit">提交问卷</button>
+      </div>
+      <div class="success-msg" id="successMsg">
+        ✅ 问卷已成功提交！感谢您的参与。<br>
+        <div class="hint">
+          <strong>提交后请点击“导出我的答卷”下载 JSON 文件，发送给汇总人。</strong><br>
+          若未导出，可返回本页重新提交。
+        </div>
+        <button type="button" class="btn-export" id="exportBtn">📥 导出我的答卷</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'cx_survey_submissions';
+
+  // 是/否切换显示逻辑
+  function toggleYN(qId, value) {
+    const yesArea = document.getElementById(qId + '_yes');
+    const noArea = document.getElementById(qId + '_no');
+    if (yesArea) {
+      yesArea.classList.toggle('visible', value === 'yes');
+    }
+    if (noArea) {
+      noArea.classList.toggle('visible', value === 'no');
+    }
+  }
+
+  function saveToLocalStorage(data) {
+    try {
+      const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      list.push(data);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      return true;
+    } catch (e) {
+      console.error('localStorage 保存失败', e);
+      return false;
+    }
+  }
+
+  function downloadJSON(data) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const safeUnit = (data.unit || '未填写单位').replace(/[\\/:*?"<>|]/g, '_');
+    a.download = `超限运输问卷答卷_${safeUnit}_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  // 表单提交
+  document.getElementById('surveyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // 收集数据
+    const formData = new FormData(this);
+    const data = {};
+    for (let [key, value] of formData.entries()) {
+      data[key] = value;
+    }
+
+    // 验证必填
+    if (!data.unit || !data.contact || !data.phone) {
+      alert('请填写填写单位、联系人和联系电话！');
+      return;
+    }
+
+    // 提交按钮置为加载状态
+    const btn = document.querySelector('.btn-submit');
+    btn.disabled = true;
+    btn.textContent = '提交中…';
+
+    // 补充元数据
+    data._submitTime = new Date().toLocaleString('zh-CN');
+    data._id = 'static_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+
+    const saved = saveToLocalStorage(data);
+    if (saved) {
+      // 显示成功
+      document.querySelector('.submit-area').style.display = 'none';
+      document.getElementById('successMsg').classList.add('show');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+      // 绑定导出按钮
+      document.getElementById('exportBtn').onclick = function() {
+        downloadJSON(data);
+      };
+    } else {
+      alert('提交失败：浏览器存储空间不足或浏览器禁止访问 localStorage。\n\n请检查浏览器设置后重试。');
+      btn.disabled = false;
+      btn.textContent = '提交问卷';
+    }
+  });
+</script>
+</body>
+</html>
