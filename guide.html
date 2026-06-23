@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>发布指南 - 超限运输调查问卷</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.8; padding: 40px 20px; }
+.container { max-width: 800px; margin: 0 auto; }
+h1 { font-size: 28px; margin-bottom: 8px; }
+.subtitle { color: #64748b; margin-bottom: 32px; }
+.card { background: white; border-radius: 12px; padding: 28px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.card h2 { font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.card h3 { font-size: 15px; margin: 16px 0 8px; }
+.step { background: #f1f5f9; border-radius: 8px; padding: 14px 18px; margin: 10px 0; display: flex; align-items: flex-start; gap: 12px; }
+.step-num { background: #3b82f6; color: white; width: 26px; height: 26px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+.code { background: #1e293b; color: #e2e8f0; border-radius: 6px; padding: 12px 16px; font-family: 'SF Mono', Monaco, monospace; font-size: 13px; margin: 8px 0; overflow-x: auto; white-space: pre; }
+.warn { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 14px; margin: 12px 0; }
+.tip { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 14px; margin: 12px 0; }
+a { color: #2563eb; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📋 发布指南</h1>
+<p class="subtitle">宁波市公路超限运输管理调查问卷 · 在线发布与统计</p>
+
+<div class="card">
+  <h2>🚀 方案一：本地运行 + 内网穿透（推荐，5分钟完成）</h2>
+  <p>数据存在你的电脑上，通过公网链接分享给各执法队填写，后台自动汇总。</p>
+
+  <h3>第一步：启动本地服务</h3>
+  <div class="step">
+    <span class="step-num">1</span>
+    <div>
+      <strong>打开终端（Terminal），运行启动脚本：</strong>
+      <div class="code">cd /Users/guozhinian/WorkBuddy/2026-06-23-16-50-32/超限运输问卷
+bash start.sh</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-num">2</span>
+    <div>
+      <strong>等待公网链接生成</strong>，终端会显示类似：
+      <div class="code">✅ 公网链接已生成！
+
+📝 填表链接:
+   https://xxx.loca.lt
+
+📊 统计后台:
+   https://xxx.loca.lt/admin</div>
+    </div>
+  </div>
+
+  <h3>第二步：分享链接</h3>
+  <div class="step">
+    <span class="step-num">3</span>
+    <div>
+      <strong>将填表链接发给各执法队</strong><br>
+      各队打开链接 → 填写问卷 → 点击提交<br>
+      <div class="warn">⚠️ 对方首次打开链接时，会看到一个 "Click to Continue" 按钮页面，点击即可进入问卷。这是 localtunnel 的安全验证，只需操作一次。</div>
+    </div>
+  </div>
+
+  <h3>第三步：查看统计</h3>
+  <div class="step">
+    <span class="step-num">4</span>
+    <div>
+      <strong>打开统计后台链接</strong>（<code>/admin</code>），实时查看：<br>
+      • 总提交数、今日新增<br>
+      • 是/否题柱状统计图<br>
+      • 逐条详情查看<br>
+      • CSV 导出（可用 Excel 打开）<br>
+      • JSON 备份/还原
+    </div>
+  </div>
+
+  <div class="tip">
+    💡 <strong>如何停止：</strong>在终端按 <code>Ctrl+C</code> 即可。下次需要时重新运行 <code>bash start.sh</code>。
+  </div>
+  <div class="tip">
+    💡 <strong>链接有效期：</strong>只要你的电脑开机、终端不关，链接一直有效。每次重启电脑需要重新运行脚本。
+  </div>
+</div>
+
+<div class="card">
+  <h2>☁️ 方案二：部署到免费云平台（长期方案）</h2>
+  <p>如果你的问卷需要长期在线收集（不依赖电脑开关机），可以部署到 Render.com（免费额度足够使用）。</p>
+
+  <h3>操作步骤概要：</h3>
+  <div class="step">
+    <span class="step-num">1</span>
+    <div>
+      <strong>注册 Render.com</strong> → 用 GitHub 账号登录 <a href="https://render.com" target="_blank">render.com</a>
+    </div>
+  </div>
+  <div class="step">
+    <span class="step-num">2</span>
+    <div>
+      <strong>创建 Web Service</strong> → 选择 "Build and deploy from a Git repository"
+    </div>
+  </div>
+  <div class="step">
+    <span class="step-num">3</span>
+    <div>
+      <strong>配置参数：</strong><br>
+      • Build Command: <code>npm install</code><br>
+      • Start Command: <code>node server.js</code><br>
+      • 免费额度：每月 750 小时运行时间（足够）
+    </div>
+  </div>
+  <div class="step">
+    <span class="step-num">4</span>
+    <div>
+      <strong>获得永久链接</strong>，如 <code>https://xxx.onrender.com</code>
+    </div>
+  </div>
+
+  <div class="warn">⚠️ 此方案需要先将项目上传到 GitHub，并在 Render 中关联。如需协助部署，对我说"帮我部署到 Render"即可。</div>
+</div>
+
+<div class="card">
+  <h2>📊 数据安全说明</h2>
+  <ul style="padding-left: 20px; font-size: 14px; color: #475569;">
+    <li>方案一：数据仅存储在 <strong>你的电脑</strong> 上的 <code>data.json</code> 文件中</li>
+    <li>方案二：数据存储在 Render 服务器的临时文件系统中（建议定期导出备份）</li>
+    <li>问卷不收集任何个人敏感信息，仅包含单位名称、联系人、电话和工作数据</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>
